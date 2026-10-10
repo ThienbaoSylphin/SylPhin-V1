@@ -31099,14 +31099,6 @@ Missing: %s]], __SenaV4ScrambleTradeIn.banner, __SenaV4ScrambleTradeIn.status, m
 			end
 		end
 
-		v4742:AddTab({
-			Name = "Live Chat",
-			Icon = "chat"
-		}):AddSection("Global Chat", true):AddLiveChat({
-			Title = "Live Chat",
-			Height = 300
-		})
-
 		if type(v4742.AddForum) == "function" then
 			v4742:AddForum({
 				Name = "Forum",
@@ -31337,10 +31329,7 @@ Missing: %s]], __SenaV4ScrambleTradeIn.banner, __SenaV4ScrambleTradeIn.status, m
 			})
 		end
 
-		v4742:AddTab({
-			Name = "Donate",
-			Icon = "donator"
-		}):AddSection("Support Sena", true):AddSupportCard({})
+		
 
 		do
 			local function v4904(p1104, p1105)
