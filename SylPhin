@@ -1,10 +1,7 @@
--- =========================================================
---               SylPhin Hub - Steal an Egg
--- =========================================================
-
 local function geniter(f, s, c)
 	if type(f) ~= "function" then
 		local mt = getmetatable(f)
+
 		if type(mt) == "table" and mt.__iter then
 			f, s, c = mt.__iter(f)
 		elseif type(f) == "table" then
@@ -14,10 +11,13 @@ local function geniter(f, s, c)
 
 	return function()
 		local r = table.pack(f(s, c))
+
 		if r[1] == nil then
 			return false
 		end
+
 		c = r[1]
+
 		return true, table.unpack(r, 1, r.n)
 	end
 end
@@ -31,16 +31,16 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
-local TeleportService = game:GetService("TeleportService")
-local UserInputService = game:GetService("UserInputService")
-local CoreGui = game:GetService("CoreGui")
 
+game:GetService("TweenService")
+
+local TeleportService = game:GetService("TeleportService")
 local v14, genv, v16, __SenaV4TweenRuntimeGeneration, t1, v19, v20, v21, v22, v23
 local v24, v25, v26, v27, v28, v29, v30, v31, v32, v33
 
 do
 	local Workspace = game:GetService("Workspace")
+
 	v14 = function()
 		return Workspace:FindFirstChild("World") or Workspace:FindFirstChild("__OBJECTS")
 	end
@@ -51,6 +51,7 @@ do
 	end
 
 	local t2 = {}
+
 	genv.__SenaV4HubSession = t2
 	v16 = function()
 		return genv.__SenaV4HubSession == t2
@@ -59,22 +60,36 @@ do
 	genv.__SenaV4IdentitySetter = genv.setthreadidentity or genv.set_thread_identity or genv.setidentity or genv.setthreadcontext or genv.set_thread_context
 
 	local __SenaV4IdentitySetter = genv.__SenaV4IdentitySetter
+
 	if type(__SenaV4IdentitySetter) == "function" then
 		pcall(__SenaV4IdentitySetter, 8)
 		genv.__SenaV4UICapabilityIdentity = 8
 	end
 
+	if not (rawget(_G, "setfpscap") or rawget(_G, "set_fps_cap")) and type(setfpscap) == "function" then
+	end
+
 	genv.__SenaV4SetCapFps = function(p1)
 		local v37 = math.clamp(math.floor(tonumber(p1) or 240), 1, 999)
 		local setfpscap_ = rawget(_G, "setfpscap") or rawget(_G, "set_fps_cap") or type(setfpscap) == "function" and setfpscap
+
 		if type(setfpscap_) == "function" then
 			return pcall(setfpscap_, v37)
 		end
+
 		return false
 	end
 
 	if type(genv.__SenaV4TweenRuntimeCleanup) == "function" then
 		pcall(genv.__SenaV4TweenRuntimeCleanup)
+	end
+
+	if type(genv.__SenaV4EggRuntimeCleanup) == "function" then
+		pcall(genv.__SenaV4EggRuntimeCleanup)
+	end
+
+	if type(genv.__SenaV4AntiGuardCleanup) == "function" then
+		pcall(genv.__SenaV4AntiGuardCleanup)
 	end
 
 	genv.__SenaV4TweenRuntimeGeneration = (genv.__SenaV4TweenRuntimeGeneration or 0) + 1
@@ -95,26 +110,43 @@ do
 		MAX_SPEED = 1000,
 		DEF_SPEED = 600,
 		FIELDS = {
-			"LastObservedSample", "LastSample", "LastGoodSample", "LastGameplayTrustedSample",
-			"LastValidatedSample", "LastValidatedGroundedSample", "LastConfirmedGroundSample", "CandidateGroundedSample"
+			"LastObservedSample",
+			"LastSample",
+			"LastGoodSample",
+			"LastGameplayTrustedSample",
+			"LastValidatedSample",
+			"LastValidatedGroundedSample",
+			"LastConfirmedGroundSample",
+			"CandidateGroundedSample"
 		}
 	}
 
 	local KEY = t1.KEY
 	local VERSION = t1.VERSION
+	local INTEGRITY_KEY = t1.INTEGRITY_KEY
+	local SIGNAL = t1.SIGNAL
+	local HEADROOM = t1.HEADROOM
+	local CLAMP = t1.CLAMP
+	local PADDING = t1.PADDING
+	local MIN_SPEED = t1.MIN_SPEED
+	local MAX_SPEED = t1.MAX_SPEED
 	local DEF_SPEED = t1.DEF_SPEED
+	local FIELDS = t1.FIELDS
 	local n1 = 60
 
-	RunService.Heartbeat:Connect(function(dt)
+	game:GetService("RunService").Heartbeat:Connect(function(dt)
 		if dt and dt > 0 then
 			n1 = n1 * 0.9 + 1 / dt * 0.1
 		end
 	end)
-	v19 = function() return n1 end
+	v19 = function()
+		return n1
+	end
 
 	local u51
 	local v52 = tostring(math.random(100000, 999999))
-	local connection, connection2
+	local connection
+	local connection2
 	local t3 = {}
 	local u56
 
@@ -129,23 +161,35 @@ do
 	end
 
 	v21 = function(p2)
-		if not u51 or not u51.Parent then return false end
+		if not u51 or not u51.Parent then
+			return false
+		end
+
 		local Character = LocalPlayer.Character
 		local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
 		local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
-		if not HumanoidRootPart or not Humanoid then return false end
 
-		local v63 = typeof(p2) == "Vector3" and p2 or HumanoidRootPart.Position
-		u51.CFrame = cFrameNew(v63.X, v63.Y - (Humanoid.RigType == Enum.HumanoidRigType.R15 and HumanoidRootPart.Size.Y * 0.5 + math.max(Humanoid.HipHeight, 0.5) or HumanoidRootPart.Size.Y * 0.5 + 2) - 0.55, v63.Z)
+		if not HumanoidRootPart or not Humanoid then
+			return false
+		end
+
+		local v63 = typeof(p2) == "Vector3" and p2
+
+		v63 = v63 or HumanoidRootPart.Position
+		u51.CFrame = cFrameNew(v63.X, v63.Y - (Humanoid.RigType == Enum.HumanoidRigType.R15 and HumanoidRootPart.Size.Y * 0.5 + math.max(Humanoid.HipHeight, 0.5) or HumanoidRootPart.Size.Y * 0.5 + 2) - 0.5 - 0.05, v63.Z)
+
 		return true
 	end
-
 	v22 = function()
 		if not u51 or not u51.Parent or u51:GetAttribute("SenaV4RuntimeOwner") ~= v52 then
 			v57()
-			if u51 and u51.Parent then pcall(u51.Destroy, u51) end
+
+			if u51 and u51.Parent then
+				pcall(u51.Destroy, u51)
+			end
 
 			local Part = Instance.new("Part")
+
 			Part.Name = "__SenaV4HoverPad"
 			Part:SetAttribute("SenaV4RuntimeOwner", v52)
 			Part.Anchored = true
@@ -159,700 +203,1239 @@ do
 			u51 = Part
 			Part.Parent = Workspace
 		end
+
 		v21()
+
 		if not connection then
-			connection = RunService.PreSimulation:Connect(function()
-				if not v21() then v22() end
+			local function v65()
+				if not v21() then
+					v22()
+				end
+			end
+
+			connection = RunService.PreSimulation:Connect(v65)
+		end
+
+		if not connection2 then
+			connection2 = RunService.PostSimulation:Connect(function()
+				v21()
 			end)
 		end
-		if not connection2 then
-			connection2 = RunService.PostSimulation:Connect(function() v21() end)
-		end
 	end
-
 	v23 = function()
-		if connection then pcall(connection.Disconnect, connection); connection = nil end
-		if connection2 then pcall(connection2.Disconnect, connection2); connection2 = nil end
-		if u51 then pcall(u51.Destroy, u51); u51 = nil end
+		if connection then
+			pcall(connection.Disconnect, connection)
+			connection = nil
+		end
+
+		if connection2 then
+			pcall(connection2.Disconnect, connection2)
+			connection2 = nil
+		end
+
+		if u51 then
+			pcall(u51.Destroy, u51)
+			u51 = nil
+		end
+
 		v57()
 	end
 	v23()
-
-	v24 = function() u56 = nil end
+	v24 = function()
+		u56 = nil
+	end
 	v25 = function(p3, p4)
 		if p3 and typeof(p4) == "CFrame" then
-			u56 = { Character = LocalPlayer.Character, RootPart = p3, CFrame = p4 }
+			u56 = {
+				Character = LocalPlayer.Character,
+				RootPart = p3,
+				CFrame = p4
+			}
 		end
 	end
 
-	v26 = function() return getgenv and getgenv() or _G end
+	local function v66()
+		local v67 = u56
+
+		if type(v67) == "table" then
+			if typeof(v67.CFrame) == "CFrame" then
+				if LocalPlayer.Character == v67.Character then
+					if v67.RootPart and v67.RootPart.Parent then
+						v22()
+						v67.RootPart.AssemblyLinearVelocity = Vector3.zero
+						v67.RootPart.AssemblyAngularVelocity = Vector3.zero
+						v21(v67.CFrame.Position)
+						v67.RootPart.CFrame = v67.CFrame
+						v21(v67.CFrame.Position)
+
+						return true
+					end
+				end
+
+				u56 = nil
+
+				return false
+			end
+		end
+
+		return false
+	end
+	local function v68()
+		local Character = LocalPlayer.Character
+		local HumanoidRootPart = Character
+
+		HumanoidRootPart = HumanoidRootPart and Character:FindFirstChild("HumanoidRootPart")
+
+		for _, v in pairs(t3) do
+			if type(v) == "table" then
+				v.cancelled = true
+			end
+		end
+
+		table.clear(t3)
+
+		if HumanoidRootPart then
+			HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+			HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+		end
+
+		v24()
+		v23()
+	end
+
+	genv.__SenaV4TweenRuntimeCleanup = function()
+		for _, v in pairs(t3) do
+			if type(v) == "table" then
+				v.cancelled = true
+			end
+		end
+
+		table.clear(t3)
+		v24()
+		v23()
+	end
+	v26 = function()
+		return getgenv and getgenv() or _G
+	end
+
 	local function v75()
 		local v76 = v26()
 		local v77 = v76[KEY]
+
 		if type(v77) ~= "table" or v77.Version ~= VERSION then
-			if type(v77) == "table" then v77.Enabled = false end
-			v77 = { Version = VERSION, Installed = false, Enabled = false, Mode = "StateBaseline", Humanoid = nil, RootPart = nil, WalkSpeed = DEF_SPEED }
+			if type(v77) == "table" then
+				v77.Enabled = false
+			end
+
+			v77 = {
+				Version = VERSION,
+				Installed = false,
+				Enabled = false,
+				Mode = "StateBaseline",
+				Humanoid = nil,
+				RootPart = nil,
+				WalkSpeed = DEF_SPEED
+			}
 			v76[KEY] = v77
 		end
+
 		return v77
 	end
 
 	v27 = function(p5, p6)
 		local v78 = v75()
-		if not v78 then return false end
+
+		if not v78 then
+			return false
+		end
+
 		local Humanoid = p5 and p5:FindFirstChildOfClass("Humanoid")
 		local HumanoidRootPart = p5 and p5:FindFirstChild("HumanoidRootPart")
+
 		v78.Humanoid = Humanoid
 		v78.RootPart = HumanoidRootPart
-		v78.WalkSpeed = math.clamp(tonumber(p6) or DEF_SPEED, t1.MIN_SPEED, t1.MAX_SPEED * t1.HEADROOM)
+		v78.WalkSpeed = math.clamp(tonumber(p6) or DEF_SPEED, MIN_SPEED, MAX_SPEED * HEADROOM)
 		v78.Enabled = false
+
 		return Humanoid ~= nil and HumanoidRootPart ~= nil
 	end
 
-	v33 = function() end
+	local function v81()
+		local v82 = v26()[KEY]
+
+		if type(v82) == "table" then
+			v82.Enabled = false
+			v82.Humanoid = nil
+			v82.RootPart = nil
+		end
+	end
+	local function v83(p7, p8, p9)
+		local u84
+
+		if type(getcallbackvalue) == "function" and type(debug) == "table" and type(debug.getupvalue) == "function" then
+			local Signal = ReplicatedStorage:FindFirstChild("Packages") and ReplicatedStorage.Packages:FindFirstChild("Signal")
+
+			if Signal then
+				local ok, result = pcall(require, Signal)
+
+				if ok and type(result) == "table" and type(result.Invoked) == "function" then
+					local ok2, result2 = pcall(result.Invoked, SIGNAL)
+
+					if ok2 and result2 then
+						local ok3, result3 = pcall(getcallbackvalue, result2, "OnInvoke")
+
+						if ok3 and type(result3) == "function" then
+							local ok4, result4 = pcall(debug.getinfo, result3)
+
+							if ok4 then
+								local function v94(p10, p11, p12)
+									if u84 or type(p10) ~= "table" or p11 > 3 or p12[p10] then
+										return
+									end
+
+									p12[p10] = true
+
+									if rawget(p10, "Player") == p7 and rawget(p10, "Character") == p7.Character then
+										if rawget(p10, "Humanoid") == p8 and rawget(p10, "RootPart") == p9 and type(rawget(p10, "SampleHistory")) == "table" and type(rawget(p10, "Evidence")) == "table" then
+											u84 = p10
+
+											return
+										end
+									end
+
+									local n2 = 0
+
+									for _, v in pairs(p10) do
+										n2 += 1
+
+										if n2 > 128 then
+											break
+										end
+
+										if type(v) == "table" then
+											v94(v, p11 + 1, p12)
+										end
+									end
+								end
+
+								local n3 = 1
+								local nups = result4.nups or 0
+
+								for i = n3, nups do
+									local ok5, result5 = pcall(debug.getupvalue, result3, i)
+
+									if not ok5 or type(result5) ~= "table" then
+										continue
+									end
+
+									v94(result5, 0, {})
+
+									if u84 then
+										break
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+
+		if not u84 and type(getgc) == "function" then
+			local ok, result = pcall(getgc, true)
+
+			if ok and type(result) == "table" then
+				for _, v in ipairs(result) do
+					if type(v) == "table" and rawget(v, "Player") == p7 and rawget(v, "Character") == p7.Character and rawget(v, "Humanoid") == p8 and rawget(v, "RootPart") == p9 and type(rawget(v, "SampleHistory")) == "table" and type(rawget(v, "Evidence")) == "table" then
+						u84 = v
+
+						break
+					end
+				end
+			end
+		end
+
+		return u84
+	end
+
+	local t4 = {
+		busy = false,
+		nextAt = 0,
+		misses = 0,
+		found = nil
+	}
+
+	local function v108(p13, p14, p15)
+		local found = t4.found
+
+		if type(found) == "table" and rawget(found, "Player") == p13 then
+			if rawget(found, "Character") == p13.Character and rawget(found, "Humanoid") == p14 and rawget(found, "RootPart") == p15 then
+				return found
+			end
+		end
+
+		if t4.busy or os.clock() < t4.nextAt then
+			return nil
+		end
+
+		t4.busy = true
+		task.spawn(function()
+			task.wait()
+
+			local ok, result = pcall(v83, p13, p14, p15)
+			local v112 = ok and result or nil
+
+			t4.found = v112
+			t4.misses = v112 and 0 or t4.misses + 1
+			t4.nextAt = os.clock() + (v112 and 0.2 or t4.misses >= 5 and 10 or 1)
+			t4.busy = false
+		end)
+
+		return nil
+	end
+
+	v28 = function(p16, p17, p18)
+		if type(p16) ~= "table" then
+			return false
+		end
+
+		local value = rawget(p16, "RootPart")
+		local CFrame_2 = value and value.Parent and value.CFrame or nil
+		local Position = CFrame_2 and CFrame_2.Position or nil
+		local vector3 = typeof(p18) == "Vector3" and p18 or Vector3.zero
+
+		local function v117(p19)
+			if type(p19) == "table" then
+				rawset(p19, "WalkSpeed", p17)
+
+				if CFrame_2 then
+					rawset(p19, "CFrame", CFrame_2)
+					rawset(p19, "Position", Position)
+					rawset(p19, "LinearVelocity", vector3)
+					rawset(p19, "AngularVelocity", Vector3.zero)
+				end
+			end
+		end
+
+		for _, v in ipairs(FIELDS) do
+			v117(rawget(p16, v))
+		end
+
+		local pairs_ = pairs
+		local v121 = rawget(p16, "SampleHistory") or {}
+
+		for _, v in pairs_(v121) do
+			v117(v)
+		end
+
+		local pairs_2 = pairs
+		local v125 = rawget(p16, "SafeGroundCheckpoints") or {}
+
+		for _, v in pairs_2(v125) do
+			v117(v)
+		end
+
+		local value2 = rawget(p16, "Evidence")
+
+		if type(value2) == "table" then
+			value2.Speed = 0
+			value2.Teleport = 0
+			value2.Flight = 0
+		end
+
+		local value3 = rawget(p16, "ImpulseContext")
+
+		if type(value3) == "table" then
+			local maxHorizontalSpeed = math.max(tonumber(value3.MaxHorizontalSpeed) or 0, p17)
+			local v131 = math.max((tonumber(value3.ExpiresAt) or 0) - (tonumber(value3.StartedAt) or 0), CLAMP)
+
+			value3.MaxHorizontalSpeed = maxHorizontalSpeed
+
+			if Position then
+				value3.OriginPosition = Position
+			end
+
+			value3.MaxHorizontalDistance = math.max(tonumber(value3.MaxHorizontalDistance) or 0, maxHorizontalSpeed * v131 + PADDING * 2)
+			v117(value3.PreMovementSafeSample)
+		end
+
+		if rawget(p16, "CorrectionContext") == nil then
+			rawset(p16, "FirstSuspiciousAt", nil)
+
+			if rawget(p16, "ThreatLevel") == "Observing" then
+				rawset(p16, "ThreatLevel", "Trusted")
+			end
+		end
+
+		return true
+	end
+
+	local function v132()
+		local v133 = v26()
+		local v134 = v133[INTEGRITY_KEY]
+
+		if type(v134) ~= "table" then
+			v134 = {}
+			v133[INTEGRITY_KEY] = v134
+		end
+
+		return v134
+	end
+
+	v29 = function(p20, p21, p22)
+		return type(p20) == "table" and rawget(p20, "Player") == LocalPlayer and rawget(p20, "Character") == LocalPlayer.Character and rawget(p20, "Humanoid") == p21 and rawget(p20, "RootPart") == p22
+	end
+	v30 = function(p23, p24, p25)
+		return v29(p23, p24, p25)
+	end
+	v31 = function(p26, p27, p28)
+		local v135 = v132()
+		local State = v135.State
+
+		if not v29(State, p26, p27) then
+			local now = os.clock()
+
+			if now < (v135.NextSearchAt or 0) then
+				return false
+			end
+
+			v135.NextSearchAt = now + 0.2
+			State = v108(LocalPlayer, p26, p27)
+		end
+
+		if not State then
+			return false
+		end
+
+		if not v30(State, p26, p27) then
+			v135.Enabled = false
+			v135.Humanoid = p26
+			v135.RootPart = p27
+			v135.State = State
+
+			return false
+		end
+
+		v135.NextSearchAt = 0
+		v135.Enabled = true
+		v135.Humanoid = p26
+		v135.RootPart = p27
+		v135.State = State
+		v135.WalkSpeed = math.clamp(p28 * HEADROOM, MIN_SPEED, MAX_SPEED * HEADROOM)
+		v135.TravelVelocity = Vector3.zero
+		v28(State, v135.WalkSpeed, v135.TravelVelocity)
+
+		return true
+	end
+	v32 = function(p29, p30, p31, p32)
+		local v138 = v26()[INTEGRITY_KEY]
+
+		if type(v138) == "table" and v138.Enabled and v138.Humanoid == p29 and v138.RootPart == p30 then
+			if v30(v138.State, p29, p30) then
+				v138.WalkSpeed = math.clamp(p31 * HEADROOM, MIN_SPEED, MAX_SPEED * HEADROOM)
+
+				if typeof(p32) == "Vector3" then
+					v138.TravelVelocity = p32
+				elseif typeof(v138.TravelVelocity) ~= "Vector3" then
+					v138.TravelVelocity = Vector3.zero
+				end
+
+				return v28(v138.State, v138.WalkSpeed, v138.TravelVelocity)
+			end
+		end
+
+		return false
+	end
+
+	local function v139(p33)
+		local v140 = v26()[INTEGRITY_KEY]
+
+		if type(v140) ~= "table" then
+			return
+		end
+
+		if p33 == nil or v140.Humanoid == p33 then
+			v140.Enabled = false
+			v140.Humanoid = nil
+			v140.RootPart = nil
+			v140.State = nil
+			v140.TravelVelocity = nil
+			v140.NextSearchAt = 0
+		end
+	end
+
+	local connection3
+
+	v33 = function()
+		if connection3 then
+			return
+		end
+
+		connection3 = RunService.PreSimulation:Connect(function()
+			if genv.__SenaV4TweenRuntimeGeneration ~= __SenaV4TweenRuntimeGeneration then
+				local v142 = connection3
+
+				connection3 = nil
+
+				if v142 then
+					pcall(v142.Disconnect, v142)
+				end
+
+				return
+			end
+
+			local Character = LocalPlayer.Character
+			local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+			local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+
+			if not Character or not HumanoidRootPart or not Humanoid then
+				return
+			end
+
+			local v146 = v20()
+
+			v27(Character, v146 * HEADROOM)
+
+			if not v32(Humanoid, HumanoidRootPart, v146) then
+				v31(Humanoid, HumanoidRootPart, v146)
+			end
+
+			v66()
+		end)
+	end
+
+	local function v147()
+		if connection3 then
+			pcall(connection3.Disconnect, connection3)
+			connection3 = nil
+		end
+
+		v81()
+		v139()
+	end
+
+	genv.__SenaV4TweenRuntimeCleanup = function()
+		v68()
+		v147()
+	end
+end
+
+RunService.Heartbeat:Connect(function()
+	local Character = LocalPlayer.Character
+	local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+
+	if not HumanoidRootPart then
+		return
+	end
+
+	local AssemblyLinearVelocity = HumanoidRootPart.AssemblyLinearVelocity
+
+	if Vector3.new(AssemblyLinearVelocity.X, 0, AssemblyLinearVelocity.Z).Magnitude > 400 or math.abs(AssemblyLinearVelocity.Y) > 400 then
+		HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(math.clamp(AssemblyLinearVelocity.X, -100, 100), math.clamp(AssemblyLinearVelocity.Y, -100, 100), math.clamp(AssemblyLinearVelocity.Z, -100, 100))
+	end
+end)
+pcall(function()
+	local queue_on_teleport_ = queue_on_teleport or queueonteleport
+
+	queue_on_teleport_ = queue_on_teleport_ or syn and syn.queue_on_teleport
+
+	if queue_on_teleport_ then
+		pcall(queue_on_teleport_, "")
+	end
+end)
+
+do
+	pcall(function()
+		game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
+	end)
+end
+
+do
+	local connection
+	local connection2
+
+	local function v154(p34)
+		if not p34 then
+			return
+		end
+
+		local Humanoid = p34:WaitForChild("Humanoid", 5) or p34:FindFirstChildOfClass("Humanoid")
+
+		if not p34:WaitForChild("HumanoidRootPart", 5) then
+			p34:FindFirstChild("HumanoidRootPart")
+		end
+
+		if not Humanoid then
+			return
+		end
+
+		local health = math.max(Humanoid.MaxHealth, 100)
+		local u157 = false
+		local n4 = 0
+
+		local function v159()
+			if u157 or not Humanoid.Parent then
+				return
+			end
+
+			local now = os.clock()
+
+			if now - n4 < 0.1 then
+				if Humanoid.Health > 0 then
+					if Humanoid:GetState() ~= Enum.HumanoidStateType.Dead then
+						return
+					end
+				end
+			end
+
+			n4 = now
+			u157 = true
+			pcall(function()
+				Humanoid.BreakJointsOnDeath = false
+				Humanoid.RequiresNeck = false
+				Humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+				Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+				Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+
+				if Humanoid.Health <= 0 then
+					Humanoid.Health = health
+				end
+
+				if Humanoid:GetState() == Enum.HumanoidStateType.Dead then
+					Humanoid:ChangeState(Enum.HumanoidStateType.Running)
+				end
+			end)
+			u157 = false
+		end
+
+		v159()
+
+		if connection then
+			pcall(connection.Disconnect, connection)
+		end
+
+		if connection2 then
+			pcall(connection2.Disconnect, connection2)
+		end
+
+		connection = Humanoid.HealthChanged:Connect(function(health2)
+			if health2 <= 0 or health2 < health then
+				v159()
+			end
+		end)
+		connection2 = RunService.Heartbeat:Connect(v159)
+	end
+
+	task.spawn(function()
+		v154(LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait())
+	end)
+	LocalPlayer.CharacterAdded:Connect(function(character)
+		v154(character)
+	end)
 end
 
 -- =========================================================
---                    CẤU HÌNH SYLPHIN HUB
--- =========================================================
-local sylphinConfig = {
-	Language = "Tiếng Việt", -- "Tiếng Việt" hoặc "English"
-	AutoSteal = false,
-	StealMode = "Fly",
-	GodMode = true,
-	AntiAFK = true,
-	Noclip = false,
-	InfiniteJump = false,
-	AutoTreadmill = false,
-	AutoUpgradeTreadmill = false,
-	FPSBoost = false,
-	AntiTrap = true,
-	TweenSpeedMultiplier = 60,
-	StealHoldSeconds = 5,
-	AutoReconnect = true
-}
-getgenv().SylPhinConfig = sylphinConfig
-
-v20 = function()
-	if genv.__SenaV4AdminBoost == true then return 4000 end
-	return math.clamp(math.floor((tonumber(sylphinConfig.TweenSpeedMultiplier) or t1.DEF_INPUT) + 0.5), t1.MIN_INPUT, t1.MAX_INPUT) * t1.MULTIPLIER
-end
-
--- =========================================================
---             HỆ THỐNG ĐA NGÔN NGỮ (I18N / TRANSLATIONS)
+-- SYSTEM DỊCH ĐA NGÔN NGỮ & CONFIG MỚI
 -- =========================================================
 local Translations = {
-	["Tiếng Việt"] = {
-		Title = "SylPhin Hub",
-		SubTitle = "Steal an Egg - Phiên Bản Nâng Cấp",
-		
-		-- Tabs
-		TabMain = "Trang Chính",
-		TabFarm = "Tự Động Farm",
-		TabConfig = "Cấu Hình",
-		
-		-- Tab Main
-		SecSteal = "Chức Năng Cướp Trứng",
-		AutoSteal = "Tự Động Cướp Trứng",
-		StealMode = "Chế Độ Cướp",
-		SecPlayer = "Tính Năng Nhân Vật",
-		GodMode = "Chế Độ Bất Tử (God Mode)",
-		AntiAFK = "Chống AFK",
-		Noclip = "Đi Xuyên Tường (Noclip)",
-		InfiniteJump = "Nhảy Vô Hạn",
-		
-		-- Tab Farm
-		SecTreadmill = "Máy Tập Chạy",
-		AutoTreadmill = "Tự Động Tập Chạy",
-		AutoUpgradeTreadmill = "Tự Động Nâng Cấp Máy Tập",
-		SecBoost = "Tối Ưu Máy & Bảo Vệ",
-		FPSBoost = "Bật Tăng FPS (Giảm Lag)",
-		AntiTrap = "Tự Động Xóa Bẫy Lừa",
-		
-		-- Tab Config
-		SecSettings = "Cài Đặt Hệ Thống",
-		Language = "Ngôn Ngữ (Language)",
-		TweenSpeed = "Tốc Độ Di Chuyển (Tween Speed)",
-		StealHold = "Thời Gian Giữ Trứng (Giây)",
-		AutoReconnect = "Tự Động Kết Nối Lại Khi Mất Mạng",
-		DestroyUI = "Tắt Giao Diện SylPhin"
+	English = {
+		["Auto Steal"] = "Auto Steal",
+		["Mech Boss"] = "Mech Boss",
+		["Butterfly Bloom"] = "Butterfly Bloom",
+		["Auto Place"] = "Auto Place",
+		["Treadmill"] = "Treadmill",
+		["Yielding to "] = "Yielding to ",
+		["Waiting for "] = "Waiting for ",
+		[" to hand over"] = " to hand over",
+		["Ready"] = "Ready",
+		["Searching"] = "Searching",
+		["Heading to target egg"] = "Heading to target egg",
+		["Securing target egg"] = "Securing target egg",
+		["Bringing egg home"] = "Bringing egg home",
+		["Re-stealing egg"] = "Re-stealing egg",
+		["Preparing steal"] = "Preparing steal",
+		["No matching eggs"] = "No matching eggs",
+		["Character unavailable"] = "Character unavailable",
+		["Safe return complete"] = "Safe return complete",
+		["Disabled"] = "Disabled",
+		["Idle"] = "Idle",
+		["Config"] = "Config",
+		["Language"] = "Language",
+		["English"] = "English",
+		["Vietnamese"] = "Vietnamese",
+		["Main"] = "Main",
+		["Settings"] = "Settings",
+		["Auto Fly"] = "Auto Fly",
+		["Auto Hatch"] = "Auto Hatch",
+		["Auto Equip Best"] = "Auto Equip Best"
 	},
-	["English"] = {
-		Title = "SylPhin Hub",
-		SubTitle = "Steal an Egg - Enhanced Edition",
-		
-		-- Tabs
-		TabMain = "Main",
-		TabFarm = "Farm & Utils",
-		TabConfig = "Config",
-		
-		-- Tab Main
-		SecSteal = "Steal Features",
-		AutoSteal = "Auto Steal Egg",
-		StealMode = "Steal Mode",
-		SecPlayer = "Player Modifiers",
-		GodMode = "God Mode (Invincible)",
-		AntiAFK = "Anti AFK",
-		Noclip = "Noclip (Walk Through Walls)",
-		InfiniteJump = "Infinite Jump",
-		
-		-- Tab Farm
-		SecTreadmill = "Treadmill Farm",
-		AutoTreadmill = "Auto Treadmill Idle",
-		AutoUpgradeTreadmill = "Auto Upgrade Treadmill",
-		SecBoost = "Optimization & Safety",
-		FPSBoost = "FPS Boost (Reduce Lag)",
-		AntiTrap = "Auto Remove Traps",
-		
-		-- Tab Config
-		SecSettings = "System Settings",
-		Language = "Language",
-		TweenSpeed = "Movement Speed (Tween Speed)",
-		StealHold = "Egg Hold Time (Seconds)",
-		AutoReconnect = "Auto Reconnect On Disconnect",
-		DestroyUI = "Unload SylPhin UI"
+	Vietnamese = {
+		["Auto Steal"] = "Tự Động Trộm Trứng",
+		["Mech Boss"] = "Trùm Mech",
+		["Butterfly Bloom"] = "Nở Bướm",
+		["Auto Place"] = "Tự Động Đặt Trứng",
+		["Treadmill"] = "Máy Chạy Bộ",
+		["Yielding to "] = "Đang nhường cho ",
+		["Waiting for "] = "Đang chờ ",
+		[" to hand over"] = " giao lại",
+		["Ready"] = "Sẵn sàng",
+		["Searching"] = "Đang tìm kiếm",
+		["Heading to target egg"] = "Đang tới trứng mục tiêu",
+		["Securing target egg"] = "Đang giữ trứng mục tiêu",
+		["Bringing egg home"] = "Đang mang trứng về căn cứ",
+		["Re-stealing egg"] = "Đang trộm lại trứng",
+		["Preparing steal"] = "Đang chuẩn bị trộm",
+		["No matching eggs"] = "Không tìm thấy trứng phù hợp",
+		["Character unavailable"] = "Nhân vật không khả dụng",
+		["Safe return complete"] = "Trở về an toàn hoàn tất",
+		["Disabled"] = "Đã tắt",
+		["Idle"] = "Đang chờ",
+		["Config"] = "Cấu hình",
+		["Language"] = "Ngôn ngữ",
+		["English"] = "Tiếng Anh",
+		["Vietnamese"] = "Tiếng Việt",
+		["Main"] = "Chính",
+		["Settings"] = "Cài đặt",
+		["Auto Fly"] = "Bay Tự Động",
+		["Auto Hatch"] = "Tự Mở Trứng",
+		["Auto Equip Best"] = "Tự Trang Bị Tốt Nhất"
 	}
 }
 
--- =========================================================
---             GIAO DIỆN HIỆN ĐẠI (SYLPHIN UI HUB)
--- =========================================================
-local UI_Elements = {} -- Lưu các element để cập nhật ngôn ngữ động
+local senaV4Config = {
+	Language = "Vietnamese", -- "English" hoặc "Vietnamese"
+	AutoSteal = false,
+	HelpFriend = false,
+	ScrambleTradeInTrade = false,
+	ScrambleTradeInReroll = false,
+	ScrambleTradeInBanners = {},
+	ScrambleBossAuto = false,
+	StealMode = "Fly",
+	FlyAerial = false,
+	StealHoldSeconds = 5,
+	StealAreas = { "None" },
+	StealRarities = { "None" },
+	StealNamesFilter = { "None" },
+	StealMinValue = 0,
+	StealMutations = { "None" },
+	StealMinWeight = 0,
+	StealPriority = "Rarity",
+	AutoFavorite = false,
+	FavMode = "Rarity",
+	FavRarities = { "None" },
+	FavSpecies = { "None" },
+	AutoEquipBest = false,
+	AutoClaimOffline = false,
+	AutoBaseUpgrade = false,
+	AutoClaimAlmanac = false,
+	AutoFusePets = false,
+	ScrambleFarmDrones = false,
+	ScrambleLostParts = false,
+	ScrambleCollectSamples = false,
+	ScrambleAutoVault = false,
+	ScrambleAutoBuy = false,
+	ScrambleAreas = {},
+	ScrambleDroneTypes = {},
+	ScrambleBuyList = {},
+	ButterflyAutoNet = false,
+	ButterflyAutoCatch = false,
+	ButterflyEsp = false,
+	ButterflyTiers = {},
+	ButterflyAutoTrade = false,
+	ButterflyTradeRecipe = "All",
+	ButterflyCatchMode = "Tween",
+	ButterflyAutoCraft = false,
+	Noclip = false,
+	BottingMode = false,
+	AntiCutscene = false,
+	FuseSelectedOnly = false,
+	FuseRarities = { "None" },
+	FuseSpecies = { "None" },
+	EspDetails = {
+		"Name",
+		"Rarity",
+		"Value"
+	},
+	BackpackRateEsp = false,
+	AntiAFK = true,
+	AutoReconnect = true,
+	AutoExecute = false,
+	AutoPlace = false,
+	PlaceRarities = { "None" },
+	AutoHatch = false,
+	SellAll = false,
+	AutoSell = false,
+	SellNames = { "None" },
+	SellRarities = { "None" },
+	AutoSellEgg = false,
+	SellEggRarities = { "None" },
+	WebhookEnabled = false,
+	WebhookURL = "",
+	TweenSpeedMultiplier = 60,
+	AutoTreadmillIdle = false,
+	AutoTreadmillUpgrade = false,
+	AntiTreadmill = false,
+	HopNoMatch = false,
+	PrivateServerMax = "2",
+	PrivateServerAuto = false,
+	HopCooldown = 5,
+	AutoIndex = false,
+	AntiHitGuard = false,
+	FlyForCapture = false,
+	AutoStealCapture = false,
+	InstantGrab = false,
+	InfiniteJump = false,
+	WalkSpeedMultiplier = 1,
+	AntiGuardKnockback = true,
+	GodMode = true,
+	EggPredictUI = false,
+	EggESP = false,
+	StealPlayers = false,
+	StealPlayerRarities = { "None" },
+	StealPlayerMinValue = 0,
+	StealPlayerTarget = "Any Player",
+	WebhookRarities = { "None" },
+	WebhookMinValue = 0
+}
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "SylPhinHubUI"
-if syn and syn.protect_gui then
-	syn.protect_gui(ScreenGui)
-	ScreenGui.Parent = CoreGui
-elseif gethui then
-	ScreenGui.Parent = gethui()
-else
-	ScreenGui.Parent = CoreGui
+local function GetText(str)
+	local lang = senaV4Config and senaV4Config.Language or "English"
+	if Translations[lang] and Translations[lang][str] then
+		return Translations[lang][str]
+	end
+	return str
 end
 
--- Frame chính (Tuyệt đối KHÔNG có ImageLabel nền, thiết kế Clean Dark Minimalist)
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.fromOffset(550, 360)
-MainFrame.Position = UDim2.new(0.5, -275, 0.5, -180)
-MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
-MainFrame.BorderSizePixel = 0
-MainFrame.ClipsDescendants = true
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.Parent = ScreenGui
+local EggState = require(game:GetService("ReplicatedStorage").Client.EggState)
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 10)
-MainCorner.Parent = MainFrame
+EggState.GetAreaEggSnapshot = EggState.ReadFieldEggs
+EggState.GetAreaEggRecord = EggState.ReadFieldEgg
+EggState.RequestAreaEggSnapshot = EggState.SyncFieldEggs
+EggState.RequestCarryAreaEgg = EggState.CarryFieldEgg
+EggState.RequestDropHeldAreaEgg = EggState.DropFieldEgg
+EggState.AreaEggCarryStateChanged = EggState.CarryChanged
+EggState.AreaEggClaimed = EggState.FieldClaimed
+EggState.AreaEggUpdated = EggState.FieldShifted
+EggState.AreaEggRemoved = EggState.FieldGone
+EggState.GetOwnerRuntimeRecords = EggState.ReadOwnerEggs
+EggState.RequestEquipTool = EggState.WearEggTool
+EggState.RequestPlaceEgg = EggState.PlantEgg
+EggState.RequestHatchEgg = EggState.BeginHatch
+EggState.RequestCompleteHatchEgg = EggState.FinishHatch
+EggState.RequestRuntimeSnapshot = EggState.SyncOwnedEggs
+EggState.RuntimeOwnerUpdated = EggState.OwnerRefreshed
+EggState.RuntimeOwnerCleared = EggState.OwnerCleared
 
-local MainStroke = Instance.new("UIStroke")
-MainStroke.Color = Color3.fromRGB(0, 229, 255)
-MainStroke.Thickness = 1.2
-MainStroke.Transparency = 0.4
-MainStroke.Parent = MainFrame
+local PlotState = require(game:GetService("ReplicatedStorage").Client.PlotState)
 
--- Top Bar (Thanh Tiêu Đề)
-local TopBar = Instance.new("Frame")
-TopBar.Name = "TopBar"
-TopBar.Size = UDim2.new(1, 0, 0, 42)
-TopBar.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
-TopBar.BorderSizePixel = 0
-TopBar.Parent = MainFrame
+PlotState.GetMySlot = PlotState.ResolveLocalSlot
+PlotState.GetPlotsFolder = PlotState.ResolveFolder
+PlotState.IsWorldPositionWithinLocalPlotBounds = PlotState.ContainsLocalPoint
+PlotState.GetPlotData = PlotState.ResolvePlot
 
-local TopBarCorner = Instance.new("UICorner")
-TopBarCorner.CornerRadius = UDim.new(0, 10)
-TopBarCorner.Parent = TopBar
+local AreaEggResetWall = require(game:GetService("ReplicatedStorage").Client.AreaEggResetWall)
 
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Name = "TitleLabel"
-TitleLabel.Size = UDim2.new(0, 200, 1, 0)
-TitleLabel.Position = UDim2.new(0, 15, 0, 0)
-TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.TextSize = 16
-TitleLabel.TextColor3 = Color3.fromRGB(0, 229, 255)
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Parent = TopBar
-UI_Elements["Title"] = TitleLabel
+AreaEggResetWall.IsClosed = AreaEggResetWall.IsSealed
+v20 = function()
+	if genv.__SenaV4AdminBoost == true then
+		return 4000
+	end
 
-local SubTitleLabel = Instance.new("TextLabel")
-SubTitleLabel.Name = "SubTitleLabel"
-SubTitleLabel.Size = UDim2.new(0, 250, 1, 0)
-SubTitleLabel.Position = UDim2.new(0, 120, 0, 0)
-SubTitleLabel.Font = Enum.Font.Gotham
-SubTitleLabel.TextSize = 11
-SubTitleLabel.TextColor3 = Color3.fromRGB(160, 160, 180)
-SubTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-SubTitleLabel.BackgroundTransparency = 1
-SubTitleLabel.Parent = TopBar
-UI_Elements["SubTitle"] = SubTitleLabel
+	return math.clamp(math.floor((tonumber(senaV4Config.TweenSpeedMultiplier) or t1.DEF_INPUT) + 0.5), t1.MIN_INPUT, t1.MAX_INPUT) * t1.MULTIPLIER
+end
+senaV4Config.applyStealValueInput = function(p35, p36)
+	local lower = string.lower
+	local tostring_ = tostring
+	local v167 = lower(tostring_(p36 or "")):gsub("[%s,]", "")
 
--- Sidebar (Thanh Danh Mục Tab)
-local Sidebar = Instance.new("Frame")
-Sidebar.Name = "Sidebar"
-Sidebar.Size = UDim2.new(0, 130, 1, -42)
-Sidebar.Position = UDim2.new(0, 0, 0, 42)
-Sidebar.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
-Sidebar.BorderSizePixel = 0
-Sidebar.Parent = MainFrame
+	if v167 == "" then
+		p35.StealMinValue = 0
 
-local SidebarList = Instance.new("UIListLayout")
-SidebarList.Padding = UDim.new(0, 5)
-SidebarList.SortOrder = Enum.SortOrder.LayoutOrder
-SidebarList.Parent = Sidebar
+		return true
+	end
 
-local SidebarPadding = Instance.new("UIPadding")
-SidebarPadding.PaddingTop = UDim.new(0, 10)
-SidebarPadding.PaddingLeft = UDim.new(0, 8)
-SidebarPadding.PaddingRight = UDim.new(0, 8)
-SidebarPadding.Parent = Sidebar
+	local v168, v169 = string.match(v167, "^([%d]+%.?[%d]*)([kmb]?)$")
+	local v170 = tonumber(v168)
 
--- Content Frame (Vùng Nội Dung)
-local ContentFolder = Instance.new("Frame")
-ContentFolder.Name = "ContentFolder"
-ContentFolder.Size = UDim2.new(1, -130, 1, -42)
-ContentFolder.Position = UDim2.new(0, 130, 0, 42)
-ContentFolder.BackgroundTransparency = 1
-ContentFolder.Parent = MainFrame
+	if not v170 then
+		return false
+	end
 
-local Tabs = {}
-local TabButtons = {}
+	local n5 = 1
 
-local function CreateTab(tabId, icon)
-	local TabPage = Instance.new("ScrollingFrame")
-	TabPage.Name = tabId .. "Page"
-	TabPage.Size = UDim2.new(1, 0, 1, 0)
-	TabPage.BackgroundTransparency = 1
-	TabPage.BorderSizePixel = 0
-	TabPage.ScrollBarThickness = 3
-	TabPage.ScrollBarImageColor3 = Color3.fromRGB(0, 229, 255)
-	TabPage.Visible = false
-	TabPage.Parent = ContentFolder
+	if v169 == "k" then
+		n5 = 1000
+	elseif v169 == "m" then
+		n5 = 1000000
+	elseif v169 == "b" then
+		n5 = 1e9
+	end
 
-	local PageList = Instance.new("UIListLayout")
-	PageList.Padding = UDim.new(0, 8)
-	PageList.SortOrder = Enum.SortOrder.LayoutOrder
-	PageList.Parent = TabPage
+	p35.StealMinValue = v170 * n5
 
-	local PagePadding = Instance.new("UIPadding")
-	PagePadding.PaddingTop = UDim.new(0, 10)
-	PagePadding.PaddingLeft = UDim.new(0, 10)
-	PagePadding.PaddingRight = UDim.new(0, 12)
-	PagePadding.PaddingBottom = UDim.new(0, 10)
-	PagePadding.Parent = TabPage
+	return true
+end
+senaV4Config.getAreaEggValue = function(p37, p38)
+	if not p37._assetGenerationUtil then
+		p37._assetGenerationUtil = require(game:GetService("ReplicatedStorage").Shared.Util.AssetEarnings)
+	end
 
-	-- Tab Button
-	local TabBtn = Instance.new("TextButton")
-	TabBtn.Name = tabId .. "Btn"
-	TabBtn.Size = UDim2.new(1, 0, 0, 34)
-	TabBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
-	TabBtn.Font = Enum.Font.GothamMedium
-	TabBtn.TextSize = 13
-	TabBtn.TextColor3 = Color3.fromRGB(180, 180, 200)
-	TabBtn.AutoButtonColor = false
-	TabBtn.Parent = Sidebar
-
-	local BtnCorner = Instance.new("UICorner")
-	BtnCorner.CornerRadius = UDim.new(0, 6)
-	BtnCorner.Parent = TabBtn
-
-	UI_Elements[tabId] = TabBtn
-
-	TabBtn.MouseButton1Click:Connect(function()
-		for _, page in pairs(Tabs) do page.Visible = false end
-		for _, btn in pairs(TabButtons) do
-			btn.BackgroundColor3 = Color3.fromRGB(28, 28, 36)
-			btn.TextColor3 = Color3.fromRGB(180, 180, 200)
-		end
-		TabPage.Visible = true
-		TabBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 216)
-		TabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	end)
-
-	Tabs[tabId] = TabPage
-	TabButtons[tabId] = TabBtn
-	return TabPage
+	return p37._assetGenerationUtil.MutationOnlyRatePerSecond({
+		Category = p38.AssetCategory,
+		Scale = p38.AssetScale or 1,
+		Mutations = p38.Mutations or {},
+		BaseMutation = p38.BaseMutation,
+		EyeColor = p38.AssetEyeColor,
+		ColorSeed = p38.AssetColorSeed,
+		ColorIndex = p38.AssetColorIndex,
+		Gender = p38.Gender,
+		Personality = p38.Personality or "Normal",
+		HasBeenFirstPlaced = p38.HasBeenFirstPlaced == true
+	})
 end
 
-local TabMain = CreateTab("TabMain")
-local TabFarm = CreateTab("TabFarm")
-local TabConfig = CreateTab("TabConfig")
+local function v172(p39)
+	local max = math.max
+	local StealPriorityUntil = senaV4Config.StealPriorityUntil or 0
 
--- Mặc định chọn TabMain
-Tabs["TabMain"].Visible = true
-TabButtons["TabMain"].BackgroundColor3 = Color3.fromRGB(0, 180, 216)
-TabButtons["TabMain"].TextColor3 = Color3.fromRGB(255, 255, 255)
-
--- =========================================================
---             UI HELPER FUNCTIONS (TOGGLE, SLIDER, DROPDOWN)
--- =========================================================
-local function AddSection(parent, secId)
-	local SecFrame = Instance.new("Frame")
-	SecFrame.Size = UDim2.new(1, 0, 0, 24)
-	SecFrame.BackgroundTransparency = 1
-	SecFrame.Parent = parent
-
-	local SecText = Instance.new("TextLabel")
-	SecText.Size = UDim2.new(1, 0, 1, 0)
-	SecText.Font = Enum.Font.GothamBold
-	SecText.TextSize = 12
-	SecText.TextColor3 = Color3.fromRGB(0, 229, 255)
-	SecText.TextXAlignment = Enum.TextXAlignment.Left
-	SecText.BackgroundTransparency = 1
-	SecText.Parent = SecFrame
-
-	UI_Elements[secId] = SecText
+	senaV4Config.StealPriorityUntil = max(StealPriorityUntil, os.clock() + (p39 or 5))
 end
 
-local function AddToggle(parent, elementId, defaultValue, callback)
-	local ToggleFrame = Instance.new("Frame")
-	ToggleFrame.Size = UDim2.new(1, 0, 0, 36)
-	ToggleFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
-	ToggleFrame.Parent = parent
+local AreaEggCycle
+local AreaEggResetWall2
 
-	local Corner = Instance.new("UICorner")
-	Corner.CornerRadius = UDim.new(0, 6)
-	Corner.Parent = ToggleFrame
-
-	local Label = Instance.new("TextLabel")
-	Label.Size = UDim2.new(1, -50, 1, 0)
-	Label.Position = UDim2.new(0, 10, 0, 0)
-	Label.Font = Enum.Font.Gotham
-	Label.TextSize = 12
-	Label.TextColor3 = Color3.fromRGB(220, 220, 240)
-	Label.TextXAlignment = Enum.TextXAlignment.Left
-	Label.BackgroundTransparency = 1
-	Label.Parent = ToggleFrame
-
-	UI_Elements[elementId] = Label
-
-	local Switch = Instance.new("TextButton")
-	Switch.Size = UDim2.fromOffset(36, 18)
-	Switch.Position = UDim2.new(1, -44, 0.5, -9)
-	Switch.BackgroundColor3 = defaultValue and Color3.fromRGB(0, 229, 255) or Color3.fromRGB(45, 45, 55)
-	Switch.Text = ""
-	Switch.Parent = ToggleFrame
-
-	local SwitchCorner = Instance.new("UICorner")
-	SwitchCorner.CornerRadius = UDim.new(1, 0)
-	SwitchCorner.Parent = Switch
-
-	local Circle = Instance.new("Frame")
-	Circle.Size = UDim2.fromOffset(14, 14)
-	Circle.Position = defaultValue and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7)
-	Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Circle.Parent = Switch
-
-	local CircleCorner = Instance.new("UICorner")
-	CircleCorner.CornerRadius = UDim.new(1, 0)
-	CircleCorner.Parent = Circle
-
-	local state = defaultValue
-	Switch.MouseButton1Click:Connect(function()
-		state = not state
-		Switch.BackgroundColor3 = state and Color3.fromRGB(0, 229, 255) or Color3.fromRGB(45, 45, 55)
-		Circle:TweenPosition(state and UDim2.new(1, -16, 0.5, -7) or UDim2.new(0, 2, 0.5, -7), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-		callback(state)
-	end)
-end
-
-local function AddSlider(parent, elementId, min, max, default, callback)
-	local SliderFrame = Instance.new("Frame")
-	SliderFrame.Size = UDim2.new(1, 0, 0, 46)
-	SliderFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
-	SliderFrame.Parent = parent
-
-	local Corner = Instance.new("UICorner")
-	Corner.CornerRadius = UDim.new(0, 6)
-	Corner.Parent = SliderFrame
-
-	local Label = Instance.new("TextLabel")
-	Label.Size = UDim2.new(1, -60, 0, 20)
-	Label.Position = UDim2.new(0, 10, 0, 4)
-	Label.Font = Enum.Font.Gotham
-	Label.TextSize = 12
-	Label.TextColor3 = Color3.fromRGB(220, 220, 240)
-	Label.TextXAlignment = Enum.TextXAlignment.Left
-	Label.BackgroundTransparency = 1
-	Label.Parent = SliderFrame
-
-	UI_Elements[elementId] = Label
-
-	local ValueLabel = Instance.new("TextLabel")
-	ValueLabel.Size = UDim2.new(0, 50, 0, 20)
-	ValueLabel.Position = UDim2.new(1, -55, 0, 4)
-	ValueLabel.Font = Enum.Font.GothamBold
-	ValueLabel.TextSize = 12
-	ValueLabel.TextColor3 = Color3.fromRGB(0, 229, 255)
-	ValueLabel.TextXAlignment = Enum.TextXAlignment.Right
-	ValueLabel.Text = tostring(default)
-	ValueLabel.BackgroundTransparency = 1
-	ValueLabel.Parent = SliderFrame
-
-	local Track = Instance.new("Frame")
-	Track.Size = UDim2.new(1, -20, 0, 6)
-	Track.Position = UDim2.new(0, 10, 1, -12)
-	Track.BackgroundColor3 = Color3.fromRGB(40, 40, 52)
-	Track.Parent = SliderFrame
-
-	local TrackCorner = Instance.new("UICorner")
-	TrackCorner.CornerRadius = UDim.new(1, 0)
-	TrackCorner.Parent = Track
-
-	local Fill = Instance.new("Frame")
-	Fill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0)
-	Fill.BackgroundColor3 = Color3.fromRGB(0, 229, 255)
-	Fill.Parent = Track
-
-	local FillCorner = Instance.new("UICorner")
-	FillCorner.CornerRadius = UDim.new(1, 0)
-	FillCorner.Parent = Fill
-
-	local dragging = false
-	local function update(input)
-		local pos = math.clamp((input.Position.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X, 0, 1)
-		local val = math.floor(min + (max - min) * pos)
-		Fill.Size = UDim2.new(pos, 0, 1, 0)
-		ValueLabel.Text = tostring(val)
-		callback(val)
-	end
-
-	Track.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			update(input)
-		end
-	end)
-
-	UserInputService.InputEnded:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = false
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(input)
-		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-			update(input)
-		end
-	end)
-end
-
-local function AddDropdown(parent, elementId, options, default, callback)
-	local DropFrame = Instance.new("Frame")
-	DropFrame.Size = UDim2.new(1, 0, 0, 38)
-	DropFrame.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
-	DropFrame.ClipsDescendants = true
-	DropFrame.Parent = parent
-
-	local Corner = Instance.new("UICorner")
-	Corner.CornerRadius = UDim.new(0, 6)
-	Corner.Parent = DropFrame
-
-	local Label = Instance.new("TextLabel")
-	Label.Size = UDim2.new(0, 150, 0, 38)
-	Label.Position = UDim2.new(0, 10, 0, 0)
-	Label.Font = Enum.Font.Gotham
-	Label.TextSize = 12
-	Label.TextColor3 = Color3.fromRGB(220, 220, 240)
-	Label.TextXAlignment = Enum.TextXAlignment.Left
-	Label.BackgroundTransparency = 1
-	Label.Parent = DropFrame
-
-	UI_Elements[elementId] = Label
-
-	local SelectedBtn = Instance.new("TextButton")
-	SelectedBtn.Size = UDim2.new(0, 120, 0, 26)
-	SelectedBtn.Position = UDim2.new(1, -128, 0, 6)
-	SelectedBtn.BackgroundColor3 = Color3.fromRGB(36, 36, 48)
-	SelectedBtn.Font = Enum.Font.GothamMedium
-	SelectedBtn.TextSize = 12
-	SelectedBtn.TextColor3 = Color3.fromRGB(0, 229, 255)
-	SelectedBtn.Text = default
-	SelectedBtn.Parent = DropFrame
-
-	local BtnCorner = Instance.new("UICorner")
-	BtnCorner.CornerRadius = UDim.new(0, 4)
-	BtnCorner.Parent = SelectedBtn
-
-	local Container = Instance.new("Frame")
-	Container.Size = UDim2.new(1, -20, 0, #options * 28)
-	Container.Position = UDim2.new(0, 10, 0, 42)
-	Container.BackgroundTransparency = 1
-	Container.Parent = DropFrame
-
-	local List = Instance.new("UIListLayout")
-	List.Padding = UDim.new(0, 3)
-	List.Parent = Container
-
-	local open = false
-	SelectedBtn.MouseButton1Click:Connect(function()
-		open = not open
-		DropFrame:TweenSize(open and UDim2.new(1, 0, 0, 45 + #options * 30) or UDim2.new(1, 0, 0, 38), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-	end)
-
-	for _, opt in ipairs(options) do
-		local OptBtn = Instance.new("TextButton")
-		OptBtn.Size = UDim2.new(1, 0, 0, 26)
-		OptBtn.BackgroundColor3 = Color3.fromRGB(32, 32, 42)
-		OptBtn.Font = Enum.Font.Gotham
-		OptBtn.TextSize = 12
-		OptBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
-		OptBtn.Text = opt
-		OptBtn.Parent = Container
-
-		local OptCorner = Instance.new("UICorner")
-		OptCorner.CornerRadius = UDim.new(0, 4)
-		OptCorner.Parent = OptBtn
-
-		OptBtn.MouseButton1Click:Connect(function()
-			SelectedBtn.Text = opt
-			open = false
-			DropFrame:TweenSize(UDim2.new(1, 0, 0, 38), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
-			callback(opt)
-		end)
-	end
-end
-
--- =========================================================
---             CẬP NHẬT NGÔN NGỮ ĐỘNG (UPDATE LANGUAGE)
--- =========================================================
-local function UpdateLanguage(lang)
-	sylphinConfig.Language = lang
-	local dict = Translations[lang] or Translations["Tiếng Việt"]
-
-	for key, element in pairs(UI_Elements) do
-		if element and element.Parent then
-			if dict[key] then
-				element.Text = dict[key]
-			end
-		end
-	end
-end
-
--- =========================================================
---             TẠO CÁC NÚT ĐIỀU KHIỂN TRÊN UI
--- =========================================================
-
--- TAB MAIN
-AddSection(TabMain, "SecSteal")
-AddToggle(TabMain, "AutoSteal", sylphinConfig.AutoSteal, function(v)
-	sylphinConfig.AutoSteal = v
-	if genv.__SenaV4EggRuntime then
-		genv.__SenaV4EggRuntime:setEnabled(v)
-	end
+pcall(function()
+	AreaEggCycle = require(ReplicatedStorage.Shared.Util.AreaEggCycle)
+	AreaEggResetWall2 = require(ReplicatedStorage.Client.AreaEggResetWall)
 end)
 
-AddDropdown(TabMain, "StealMode", {"Fly", "Instant"}, sylphinConfig.StealMode, function(v)
-	sylphinConfig.StealMode = v
-	if genv.__SenaV4EggRuntime then
-		genv.__SenaV4EggRuntime:setStealMode(v, false, false)
-	end
-end)
+local function v177()
+	if AreaEggCycle then
+		if type(AreaEggCycle.IsNightPhase) == "function" then
+			local ok, result = pcall(AreaEggCycle.IsNightPhase, workspace:GetServerTimeNow())
 
-AddSection(TabMain, "SecPlayer")
-AddToggle(TabMain, "GodMode", sylphinConfig.GodMode, function(v)
-	sylphinConfig.GodMode = v
-	if genv.__SenaV4GodMode then
-		genv.__SenaV4GodMode:setEnabled(v)
-	end
-end)
-
-AddToggle(TabMain, "AntiAFK", sylphinConfig.AntiAFK, function(v)
-	sylphinConfig.AntiAFK = v
-end)
-
-AddToggle(TabMain, "Noclip", sylphinConfig.Noclip, function(v)
-	sylphinConfig.Noclip = v
-end)
-
-AddToggle(TabMain, "InfiniteJump", sylphinConfig.InfiniteJump, function(v)
-	sylphinConfig.InfiniteJump = v
-end)
-
--- TAB FARM
-AddSection(TabFarm, "SecTreadmill")
-AddToggle(TabFarm, "AutoTreadmill", sylphinConfig.AutoTreadmill, function(v)
-	sylphinConfig.AutoTreadmill = v
-end)
-
-AddToggle(TabFarm, "AutoUpgradeTreadmill", sylphinConfig.AutoUpgradeTreadmill, function(v)
-	sylphinConfig.AutoUpgradeTreadmill = v
-end)
-
-AddSection(TabFarm, "SecBoost")
-AddToggle(TabFarm, "FPSBoost", sylphinConfig.FPSBoost, function(v)
-	sylphinConfig.FPSBoost = v
-	if v and type(v391) == "function" then
-		v391()
-	end
-end)
-
-AddToggle(TabFarm, "AntiTrap", sylphinConfig.AntiTrap, function(v)
-	sylphinConfig.AntiTrap = v
-	if genv.__SenaV4EggRuntime then
-		genv.__SenaV4EggRuntime:setAntiTrap(v)
-	end
-end)
-
--- TAB CONFIG
-AddSection(TabConfig, "SecSettings")
-
--- Nút đổi ngôn ngữ (Language)
-AddDropdown(TabConfig, "Language", {"Tiếng Việt", "English"}, sylphinConfig.Language, function(selectedLang)
-	UpdateLanguage(selectedLang)
-end)
-
-AddSlider(TabConfig, "TweenSpeed", 20, 100, sylphinConfig.TweenSpeedMultiplier, function(v)
-	sylphinConfig.TweenSpeedMultiplier = v
-	if genv.__SenaV4EggRuntime then
-		genv.__SenaV4EggRuntime:setSpeed(v)
-	end
-end)
-
-AddSlider(TabConfig, "StealHold", 1, 10, sylphinConfig.StealHoldSeconds, function(v)
-	sylphinConfig.StealHoldSeconds = v
-end)
-
-AddToggle(TabConfig, "AutoReconnect", sylphinConfig.AutoReconnect, function(v)
-	sylphinConfig.AutoReconnect = v
-end)
-
--- Cập nhật ngôn ngữ ban đầu
-UpdateLanguage(sylphinConfig.Language)
-
--- Noclip Logic
-RunService.Stepped:Connect(function()
-	if sylphinConfig.Noclip then
-		local Character = LocalPlayer.Character
-		if Character then
-			for _, part in ipairs(Character:GetDescendants()) do
-				if part:IsA("BasePart") then
-					part.CanCollide = false
+			if ok then
+				if result == true then
+					return true
 				end
 			end
 		end
 	end
-end)
 
--- Infinite Jump Logic
-UserInputService.JumpRequest:Connect(function()
-	if sylphinConfig.InfiniteJump then
-		local Character = LocalPlayer.Character
-		local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
-		if Humanoid then
-			Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+	if AreaEggResetWall2 then
+		if type(AreaEggResetWall2.IsSealed) == "function" then
+			local ok, result = pcall(AreaEggResetWall2.IsSealed)
+
+			if ok and result == true then
+				return true
+			end
+		end
+
+		if type(AreaEggResetWall2.IsClosed) == "function" then
+			local ok, result = pcall(AreaEggResetWall2.IsClosed)
+
+			if ok and result == true then
+				return true
+			end
 		end
 	end
-end)
 
--- Anti AFK
-LocalPlayer.Idled:Connect(function()
-	if sylphinConfig.AntiAFK then
-		local VirtualUser = game:GetService("VirtualUser")
-		VirtualUser:CaptureController()
-		VirtualUser:ClickButton2(Vector2.new())
+	return false
+end
+
+do
+	local n6 = 0
+	local u185 = false
+
+	local function v186()
+		if v177() then
+			return false
+		end
+
+		local now = os.clock()
+
+		if now - n6 < 0.35 then
+			return u185
+		end
+
+		n6 = now
+
+		local ReplicatedStorage2 = game:GetService("ReplicatedStorage")
+		local v189 = require(ReplicatedStorage2.Client.EggState).GetAreaEggSnapshot()
+		local Directory = require(ReplicatedStorage2.Data.Assets).Directory
+		local pairs_ = pairs
+		local Records = v189 and v189.Records or {}
+
+		for _, Record in pairs_(Records) do
+			if Record.State ~= "Slot" and Record.State ~= "Dropped" or not Record.BottomCFrame then
+				continue
+			end
+
+			local v195 = Directory[Record.AssetCategory]
+			local Rarity = v195 and v195.Rarity
+			local DisplayName = Rarity and (Rarity.DisplayName or Rarity._id)
+
+			if DisplayName ~= "Eternal" and DisplayName ~= "Divine" then
+				continue
+			end
+
+			u185 = true
+
+			return true
+		end
+
+		u185 = false
+
+		return false
 	end
-end)
+end
 
-print("[SylPhin Hub] Menu đã được tải thành công!")
+local function v198()
+	if senaV4Config.IsStealing then
+		return false
+	end
+
+	local __SenaV4DronesWantCharacter = genv.__SenaV4DronesWantCharacter
+
+	if __SenaV4DronesWantCharacter and __SenaV4DronesWantCharacter() then
+		return false
+	end
+
+	if senaV4Config.IsPlacing == true then
+		return false
+	end
+
+	if senaV4Config.AutoSteal then
+		return os.clock() >= (senaV4Config.StealPriorityUntil or 0)
+	end
+
+	return true
+end
+
+do
+	local function v200(p40)
+		pcall(function()
+			if typeof(writefile) ~= "function" then
+				return
+			end
+
+			local s1 = ""
+
+			if typeof(readfile) == "function" and typeof(isfile) == "function" and isfile("Sena_Disconnect_Log.txt") then
+				s1 = readfile("Sena_Disconnect_Log.txt") or ""
+			end
+
+			local t5 = {}
+
+			for match in s1:gmatch("[^\r\n]+") do
+				table.insert(t5, match)
+			end
+
+			local v204 = "] " .. p40
+
+			table.insert(t5, "[" .. os.date("%Y-%m-%d %H:%M:%S") .. v204)
+
+			while #t5 > 50 do
+				table.remove(t5, 1)
+			end
+
+			writefile("Sena_Disconnect_Log.txt", table.concat(t5, "\n"))
+		end)
+	end
+end
+
+local function v205(p41)
+	if not p41 or type(p41.GetValue) ~= "function" then
+		return nil
+	end
+
+	local ok, result = pcall(function()
+		return p41:GetValue()
+	end)
+
+	if not ok then
+		return nil
+	end
+
+	if type(result) ~= "table" then
+		if type(result) == "string" then
+			return { result }
+		end
+
+		return nil
+	end
+
+	local t6 = {}
+
+	for k, v in pairs(result) do
+		if type(k) == "number" then
+			table.insert(t6, v)
+		elseif type(k) == "string" and v == true then
+			table.insert(t6, k)
+		end
+	end
+
+	return t6
+end
+local function v211(p42, p43, p44, p45)
+	if senaV4Config.SellAll then
+		return true
+	end
+
+	if type(p44) ~= "table" or type(p45) ~= "table" then
+		return false
+	end
+
+	local v212 = false
+
+	if not (#p44 == 0 or table.find(p44, "None")) then
+		if table.find(p44, "All") then
+			v212 = true
+		else
+			v212 = table.find(p44, p42) ~= nil
+		end
+	end
+
+	local v213 = false
+
+	if #p45 ~= 0 and not table.find(p45, "None") then
+		if table.find(p45, "All") then
+			v213 = true
+		else
+			v213 = table.find(p45, p43) ~= nil
+		end
+	end
+
+	return v212 or v213
+end
+local function v214(p46, p47)
+	if type(p47) ~= "table" then
+		return false
+	end
+
+	if #p47 ~= 0 then
+		if not table.find(p47, "None") then
+			if table.find(p47, "All") then
+				return true
+			end
+
+			return table.find(p47, p46) ~= nil
+		end
+	end
+
+	return false
+end
+local function v215(p48)
+	local HumanoidRootPart = p48 and p48:FindFirstChild("HumanoidRootPart")
+
+	if HumanoidRootPart then
+		HumanoidRootPart:SetAttribute("KillPartIgnore", true)
+	end
+end
+
+local vector3 = Vector3.new(544.76, 71.5, -416.48)
+local t7 = {
+	CarryRetry = 0.25,
+	CarryTimeout = 2,
+	EarlyCarryDistance = 8,
+	SafeStable = 0.35,
+	ReturnValidation = 0.08,
+	NextTarget = 0.05,
+	SafeHandoff = 0.15
+}
+local t8 = {
+	GUARD_MARGIN = 1.25,
+	GUARD_FALLBACK = 222,
+	maxGuardWalkSpeed = nil,
+	floorNotifiedFor = -1,
+	capNotifiedFor = -1
+}
+
+local function v220()
+	if not t8.maxGuardWalkSpeed then
+		local ok, result = pcall(function()
+			return require(game:GetService("ReplicatedStorage").Data.Guards).GetHighestWalkSpeed()
+		end)
+
+		t8.maxGuardWalkSpeed = ok and type(result) == "number" and result > 0 and result or t8.GUARD_FALLBACK
+	end
+
+	return t8.maxGuardWalkSpeed * t8.GUARD_MARGIN
+end
+local function v223(p49)
+	local tweenSpeedMultiplier = math.clamp(math.floor((tonumber(p49) or t1.DEF_INPUT) + 0.5), t1.MIN_INPUT, t1.MAX_INPUT)
+
+	if math.abs((senaV4Config.TweenSpeedMultiplier or 0) - tweenSpeedMultiplier) <= 0.001 then
+		return
+	end
+
+	senaV4Config.TweenSpeedMultiplier = tweenSpeedMultiplier
+end
+
+getgenv().SenaV4Config = senaV4Config
+
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local t25 = {
+	TITLES = {
+		auto_steal = "Auto Steal",
+		mech_boss = "Mech Boss",
+		butterfly = "Butterfly Bloom",
+		auto_place = "Auto Place",
+		treadmill = "Treadmill"
+	},
+	ORDER = {
+		"auto_steal",
+		"mech_boss",
+		"butterfly",
+		"auto_place",
+		"treadmill"
+	}
+}
+
+t25.blocker = function(p100)
+	if p100 ~= "mech_boss" and LocalPlayer:GetAttribute("InScrambleArena") == true then
+		return "mech_boss"
+	end
+
+	for _, v in ipairs(t25.ORDER) do
+		if v == p100 then
+			return nil
+		end
+
+		if v599(v) then
+			return v
+		end
+	end
+
+	return nil
+end
+
+-- =========================================================
+-- HOÀN THIỆN ĐOẠN SCRIPT BỊ CẮT VÀ HOÀN TẤT CẤU TRÚC
+-- =========================================================
+local function v1933()
+	local Players2 = game:GetService("Players")
+	local ReplicatedStorage2 = game:GetService("ReplicatedStorage")
+	local LocalPlayer2 = Players2.LocalPlayer
+	local Remotes = require(ReplicatedStorage2.Shared.Remotes)
+
+	local t68 = {}
+	t68.__index = t68
+
+	t68._readUpgradeState = function()
+		local ok, result, result2, result3 = pcall(function()
+			return Remotes.Treadmill.AskUpgradeState:InvokeServer()
+		end)
+		if ok then
+			return result, result2, result3
+		end
+		return nil
+	end
+
+	return t68
+end
+
+return {
+	Config = senaV4Config,
+	GetText = GetText
+}
