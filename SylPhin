@@ -27149,17 +27149,17 @@ do
 
 			local ImageLabel = Instance.new("ImageLabel")
 
-			ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
-			ImageLabel.Position = UDim2.fromScale(0.5, 0.5)
-			ImageLabel.Size = UDim2.new(1, 40, 1, 40)
-			ImageLabel.BackgroundTransparency = 1
-			ImageLabel.Image = "rbxassetid://6015897843"
-			ImageLabel.ImageColor3 = t166.shadow
-			ImageLabel.ImageTransparency = 0.52
-			ImageLabel.ScaleType = Enum.ScaleType.Slice
-			ImageLabel.SliceCenter = Rect.new(49, 49, 450, 450)
-			ImageLabel.ZIndex = 0
-			ImageLabel.Parent = Frame
+			local TextLabel = Instance.new("TextLabel")
+            TextLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+            TextLabel.Position = UDim2.fromScale(0.5, 0.5)
+            TextLabel.Size = UDim2.new(1, 0, 1, 0)
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.Text = "SylPhin"
+            TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255) -- Màu chữ (Trắng)
+            TextLabel.TextScaled = true -- Tự động co giãn chữ vừa khung
+            TextLabel.Font = Enum.Font.SourceSansBold -- Kiểu font chữ
+            TextLabel.ZIndex = 1
+            TextLabel.Parent = Frame
 
 			local Frame2 = Instance.new("Frame")
 
