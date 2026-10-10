@@ -1,0 +1,676 @@
+-- ================================================================================
+-- HIHIHUB x SENA V4 (STEAL AN EGG) - FULL UNTRUNCATED SCRIPT
+-- UI Engine: HihiHub GUI (Z Key to Toggle)
+-- Core Engine: Sena V4 Full Core Logic & Bypass System
+-- ================================================================================
+
+-----------------------------------------------------------------------------------
+-- 1. BẢNG CẤU HÌNH TRUNG TÂM (SENAV4CONFIG FULL)
+-----------------------------------------------------------------------------------
+getgenv().senaV4Config = getgenv().senaV4Config or {
+    -- Steal Core Settings
+    AutoSteal = false,
+    StealMode = "Tween", -- "Tween", "Teleport", "Instant"
+    FlyAerial = false,
+    StealHoldSeconds = 0.5,
+    TweenSpeedMultiplier = 1.0,
+    StealAreas = {"Main Area", "VIP Area"},
+    StealRarities = {"Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic"},
+    StealNamesFilter = "",
+    StealMinValue = 0,
+    StealMinWeight = 0,
+    StealMutations = true,
+    StealPriority = "Rarity",
+    
+    -- Player Steal Settings
+    StealPlayers = false,
+    StealPlayerRarities = {"Legendary", "Mythic"},
+    StealPlayerMinValue = 0,
+    StealPlayerTarget = "",
+
+    -- Base & Eggs Management
+    AutoPlace = false,
+    PlaceRarities = {"Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic"},
+    AutoHatch = false,
+    AutoSellEgg = false,
+    SellEggRarities = {"Common", "Uncommon"},
+    AutoBaseUpgrade = false,
+    AutoClaimOffline = false,
+    AutoClaimAlmanac = false,
+    AutoFavorite = false,
+    FavMode = "Rarity",
+    FavRarities = {"Mythic"},
+    FavSpecies = "",
+
+    -- Pets Management
+    AutoEquipBest = false,
+    AutoFusePets = false,
+    FuseSelectedOnly = false,
+    FuseRarities = {"Common", "Uncommon"},
+    FuseSpecies = "",
+    AutoSell = false,
+    SellAll = false,
+    SellNames = "",
+    SellRarities = {"Common"},
+
+    -- Butterfly Bloom Minigame
+    ButterflyAutoNet = false,
+    ButterflyAutoCatch = false,
+    ButterflyEsp = false,
+    ButterflyTiers = {"Tier 1", "Tier 2", "Tier 3"},
+    ButterflyAutoTrade = false,
+    ButterflyTradeRecipe = "",
+    ButterflyCatchMode = "Safe",
+    ButterflyAutoCraft = false,
+
+    -- Scramble Arena & Boss
+    ScrambleBossAuto = false,
+    ScrambleTradeInTrade = false,
+    ScrambleTradeInReroll = false,
+    ScrambleFarmDrones = false,
+    ScrambleLostParts = false,
+    ScrambleCollectSamples = false,
+    ScrambleAutoVault = false,
+    ScrambleAutoBuy = false,
+
+    -- Player Mechanics & Anti-Cheat Bypass
+    WalkSpeedMultiplier = 16,
+    InfiniteJump = false,
+    Noclip = false,
+    GodMode = false,
+    AntiGuardKnockback = true,
+    AntiHitGuard = true,
+    AntiAFK = true,
+    AntiCutscene = true,
+    
+    -- Treadmill Logic
+    AutoTreadmillIdle = false,
+    AutoTreadmillUpgrade = false,
+    AntiTreadmill = false,
+
+    -- Visuals & FPS Boost
+    EggESP = false,
+    EggPredictUI = false,
+    BackpackRateEsp = false,
+    EspDetails = true,
+    FPSBoost = false,
+
+    -- Discord Webhook
+    WebhookEnabled = false,
+    WebhookURL = "",
+    WebhookRarities = {"Legendary", "Mythic"},
+    WebhookMinValue = 1000000
+}
+
+-----------------------------------------------------------------------------------
+-- 2. DỊCH VỤ VÀ HOOK METATABLE BYPASS ANTI-CHEAT (SCRIPT 2 CORE)
+-----------------------------------------------------------------------------------
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local UserInputService = game:GetService("UserInputService")
+local VirtualUser = game:GetService("VirtualUser")
+
+local LocalPlayer = Players.LocalPlayer
+
+-- Anti-AFK Handler
+LocalPlayer.Idled:Connect(function()
+    if senaV4Config.AntiAFK then
+        VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+    end
+end)
+
+-- Sena V4 Metatable Hooking System
+local __SenaV4StealAnEggMovementSpoof = {}
+do
+    local rawmetatable = getrawmetatable(game)
+    setreadonly(rawmetatable, false)
+    local oldIndex = rawmetatable.__index
+    local oldNamecall = rawmetatable.__namecall
+
+    rawmetatable.__index = newcclosure(function(self, index)
+        if not checkcaller() and self == LocalPlayer.Character and index == "HumanoidRootPart" and senaV4Config.GodMode then
+            return nil
+        end
+        return oldIndex(self, index)
+    end)
+
+    rawmetatable.__namecall = newcclosure(function(self, ...)
+        local method = getnamecallmethod()
+        local args = {...}
+        
+        -- Chống Guard Knockback & Hit
+        if method == "FireServer" and tostring(self):find("GuardHit") and senaV4Config.AntiHitGuard then
+            return nil
+        end
+        if method == "FireServer" and tostring(self):find("Cutscene") and senaV4Config.AntiCutscene then
+            return nil
+        end
+        return oldNamecall(self, ...)
+    end)
+    setreadonly(rawmetatable, true)
+end
+
+-----------------------------------------------------------------------------------
+-- 3. CLASS T46 & LOGIC TỰ ĐỘNG CƯỚP TRỨNG / MINIGAMES (FULL ENGINE)
+-----------------------------------------------------------------------------------
+local EggState = {}
+local PlotState = {}
+
+local t46 = {}
+t46.__index = t46
+
+function t46.new()
+    local self = setmetatable({}, t46)
+    self.IsStealing = false
+    self.CurrentTarget = nil
+    return self
+end
+
+function t46:GetBestEgg()
+    local bestEgg = nil
+    local maxPriorityValue = -1
+
+    local eggsFolder = workspace:FindFirstChild("Eggs") or workspace:FindFirstChild("Plots")
+    if not eggsFolder then return nil end
+
+    for _, egg in ipairs(eggsFolder:GetDescendants()) do
+        if egg:IsA("Model") and (egg:FindFirstChild("EggValue") or egg:FindFirstChild("Rarity")) then
+            local rarity = egg:FindFirstChild("Rarity") and egg.Rarity.Value or "Common"
+            local value = egg:FindFirstChild("EggValue") and egg.EggValue.Value or 0
+
+            -- Kiếm tra bộ lọc Rarity
+            if table.find(senaV4Config.StealRarities, rarity) and value >= senaV4Config.StealMinValue then
+                if value > maxPriorityValue then
+                    maxPriorityValue = value
+                    bestEgg = egg
+                end
+            end
+        end
+    end
+    return bestEgg
+end
+
+function t46:ExecuteSteal(eggModel)
+    if not eggModel or self.IsStealing then return end
+    self.IsStealing = true
+    self.CurrentTarget = eggModel
+
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        local targetCFrame = eggModel:GetPrimaryPartCFrame() or eggModel.WorldPivot
+
+        if senaV4Config.FlyAerial then
+            targetCFrame = targetCFrame * CFrame.new(0, 10, 0)
+        end
+
+        if senaV4Config.StealMode == "Tween" then
+            local dist = (char.HumanoidRootPart.Position - targetCFrame.Position).Magnitude
+            local speed = 50 * math.max(0.1, senaV4Config.TweenSpeedMultiplier)
+            local tInfo = TweenInfo.new(dist / speed, Enum.EasingStyle.Linear)
+            local tween = TweenService:Create(char.HumanoidRootPart, tInfo, {CFrame = targetCFrame})
+            tween:Play()
+            tween.Completed:Wait()
+        elseif senaV4Config.StealMode == "Instant" or senaV4Config.StealMode == "Teleport" then
+            char.HumanoidRootPart.CFrame = targetCFrame
+        end
+
+        -- Giữ thao tác cướp
+        task.wait(senaV4Config.StealHoldSeconds)
+
+        -- Kích hoạt Prompt / Remote Cướp Trứng
+        local prompt = eggModel:FindFirstChildWhichIsA("ProximityPrompt", true)
+        if prompt then
+            fireproximityprompt(prompt)
+        end
+    end
+    self.IsStealing = false
+end
+
+local StealController = t46.new()
+
+-- Vòng lặp Auto Steal
+task.spawn(function()
+    while task.wait(0.1) do
+        if senaV4Config.AutoSteal and not StealController.IsStealing then
+            pcall(function()
+                local targetEgg = StealController:GetBestEgg()
+                if targetEgg then
+                    StealController:ExecuteSteal(targetEgg)
+                end
+            end)
+        end
+    end
+end)
+
+-- Vòng lặp Minigames & Automation (Butterfly, Scramble, Base, Pets)
+task.spawn(function()
+    while task.wait(0.5) do
+        pcall(function()
+            -- Auto Place & Hatch
+            if senaV4Config.AutoPlace then
+                local placeRemote = ReplicatedStorage:FindFirstChild("PlaceEggRemote", true)
+                if placeRemote then placeRemote:FireServer() end
+            end
+            if senaV4Config.AutoHatch then
+                local hatchRemote = ReplicatedStorage:FindFirstChild("HatchEggRemote", true)
+                if hatchRemote then hatchRemote:FireServer() end
+            end
+
+            -- Butterfly Bloom Catch
+            if senaV4Config.ButterflyAutoCatch then
+                for _, b in ipairs(workspace:GetChildren()) do
+                    if b.Name:find("Butterfly") and b:FindFirstChild("HumanoidRootPart") then
+                        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                            LocalPlayer.Character.HumanoidRootPart.CFrame = b.HumanoidRootPart.CFrame
+                            local netRemote = ReplicatedStorage:FindFirstChild("CatchButterfly", true)
+                            if netRemote then netRemote:FireServer(b) end
+                        end
+                    end
+                end
+            end
+
+            -- Scramble Arena Parts
+            if senaV4Config.ScrambleLostParts then
+                for _, part in ipairs(workspace:GetChildren()) do
+                    if part.Name:find("LostPart") or part.Name:find("Sample") then
+                        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                            LocalPlayer.Character.HumanoidRootPart.CFrame = part.CFrame
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- Tối ưu hóa FPS Engine
+local function ApplyFPSBoost(enable)
+    if enable then
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                obj.Material = Enum.Material.Plastic
+                obj.Reflectance = 0
+            elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                obj.Transparency = 1
+            elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then
+                obj.Enabled = false
+            end
+        end
+        settings().Rendering.QualityLevel = 1
+    end
+end
+
+-- Vòng lặp vật lý nhân vật (WalkSpeed / Noclip)
+RunService.Stepped:Connect(function()
+    if senaV4Config.Noclip and LocalPlayer.Character then
+        for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        if senaV4Config.WalkSpeedMultiplier > 16 then
+            LocalPlayer.Character.Humanoid.WalkSpeed = senaV4Config.WalkSpeedMultiplier
+        end
+    end
+end)
+
+-----------------------------------------------------------------------------------
+-- 4. HIHIHUB GUI SYSTEM (FULL UI COMPONENTS)
+-----------------------------------------------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HihiHub_SenaV4_Full"
+ScreenGui.Parent = (gethui and gethui()) or game:GetService("CoreGui") or LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+-- Phím Z Toggle GUI
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.Z then
+        ScreenGui.Enabled = not ScreenGui.Enabled
+    end
+end)
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 650, 0, 450)
+MainFrame.Position = UDim2.new(0.5, -325, 0.5, -225)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 24)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 42)
+TopBar.BackgroundColor3 = Color3.fromRGB(14, 14, 18)
+TopBar.Parent = MainFrame
+
+local TopBarCorner = Instance.new("UICorner")
+TopBarCorner.CornerRadius = UDim.new(0, 10)
+TopBarCorner.Parent = TopBar
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -20, 1, 0)
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Text = "HihiHub | Sena V4 - Steal An Egg (Full Version)"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 15
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.BackgroundTransparency = 1
+Title.Parent = TopBar
+
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 160, 1, -42)
+Sidebar.Position = UDim2.new(0, 0, 0, 42)
+Sidebar.BackgroundColor3 = Color3.fromRGB(26, 26, 32)
+Sidebar.Parent = MainFrame
+
+local SidebarList = Instance.new("UIListLayout")
+SidebarList.Parent = Sidebar
+SidebarList.SortOrder = Enum.SortOrder.LayoutOrder
+SidebarList.Padding = UDim.new(0, 4)
+
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Size = UDim2.new(1, -165, 1, -47)
+ContentFrame.Position = UDim2.new(0, 162, 0, 44)
+ContentFrame.BackgroundTransparency = 1
+ContentFrame.Parent = MainFrame
+
+local TabPages = {}
+local FirstTab = true
+
+local HihiHub = {}
+
+function HihiHub:CreateTab(tabName)
+    local TabButton = Instance.new("TextButton")
+    TabButton.Size = UDim2.new(1, -10, 0, 36)
+    TabButton.Position = UDim2.new(0, 5, 0, 0)
+    TabButton.BackgroundColor3 = Color3.fromRGB(34, 34, 42)
+    TabButton.Text = tabName
+    TabButton.TextColor3 = Color3.fromRGB(180, 180, 190)
+    TabButton.Font = Enum.Font.GothamMedium
+    TabButton.TextSize = 12
+    TabButton.Parent = Sidebar
+
+    local ButtonCorner = Instance.new("UICorner")
+    ButtonCorner.CornerRadius = UDim.new(0, 6)
+    ButtonCorner.Parent = TabButton
+
+    local PageContainer = Instance.new("ScrollingFrame")
+    PageContainer.Size = UDim2.new(1, -5, 1, 0)
+    PageContainer.BackgroundTransparency = 1
+    PageContainer.ScrollBarThickness = 4
+    PageContainer.Visible = false
+    PageContainer.Parent = ContentFrame
+
+    local PageList = Instance.new("UIListLayout")
+    PageList.Parent = PageContainer
+    PageList.SortOrder = Enum.SortOrder.LayoutOrder
+    PageList.Padding = UDim.new(0, 6)
+
+    TabPages[tabName] = {Button = TabButton, Container = PageContainer}
+
+    if FirstTab then
+        FirstTab = false
+        PageContainer.Visible = true
+        TabButton.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+        TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end
+
+    TabButton.MouseButton1Click:Connect(function()
+        for _, tab in pairs(TabPages) do
+            tab.Container.Visible = false
+            tab.Button.BackgroundColor3 = Color3.fromRGB(34, 34, 42)
+            tab.Button.TextColor3 = Color3.fromRGB(180, 180, 190)
+        end
+        PageContainer.Visible = true
+        TabButton.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+        TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    end)
+
+    local TabElements = {}
+
+    function TabElements:AddToggle(text, configKey, callback)
+        local ToggleFrame = Instance.new("Frame")
+        ToggleFrame.Size = UDim2.new(1, -10, 0, 34)
+        ToggleFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+        ToggleFrame.Parent = PageContainer
+
+        local TFCorner = Instance.new("UICorner")
+        TFCorner.CornerRadius = UDim.new(0, 6)
+        TFCorner.Parent = ToggleFrame
+
+        local Label = Instance.new("TextLabel")
+        Label.Size = UDim2.new(0.7, 0, 1, 0)
+        Label.Position = UDim2.new(0, 10, 0, 0)
+        Label.Text = text
+        Label.TextColor3 = Color3.fromRGB(220, 220, 220)
+        Label.Font = Enum.Font.Gotham
+        Label.TextSize = 11
+        Label.TextXAlignment = Enum.TextXAlignment.Left
+        Label.BackgroundTransparency = 1
+        Label.Parent = ToggleFrame
+
+        local Button = Instance.new("TextButton")
+        Button.Size = UDim2.new(0, 45, 0, 20)
+        Button.Position = UDim2.new(1, -55, 0.5, -10)
+        Button.BackgroundColor3 = senaV4Config[configKey] and Color3.fromRGB(0, 190, 90) or Color3.fromRGB(70, 70, 80)
+        Button.Text = senaV4Config[configKey] and "ON" or "OFF"
+        Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Button.Font = Enum.Font.GothamBold
+        Button.TextSize = 10
+        Button.Parent = ToggleFrame
+
+        local BTCorner = Instance.new("UICorner")
+        BTCorner.CornerRadius = UDim.new(0, 4)
+        BTCorner.Parent = Button
+
+        Button.MouseButton1Click:Connect(function()
+            senaV4Config[configKey] = not senaV4Config[configKey]
+            Button.BackgroundColor3 = senaV4Config[configKey] and Color3.fromRGB(0, 190, 90) or Color3.fromRGB(70, 70, 80)
+            Button.Text = senaV4Config[configKey] and "ON" or "OFF"
+            if callback then callback(senaV4Config[configKey]) end
+        end)
+    end
+
+    function TabElements:AddSlider(text, configKey, min, max, callback)
+        local SliderFrame = Instance.new("Frame")
+        SliderFrame.Size = UDim2.new(1, -10, 0, 42)
+        SliderFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+        SliderFrame.Parent = PageContainer
+
+        local SFCorner = Instance.new("UICorner")
+        SFCorner.CornerRadius = UDim.new(0, 6)
+        SFCorner.Parent = SliderFrame
+
+        local Label = Instance.new("TextLabel")
+        Label.Size = UDim2.new(1, -20, 0, 18)
+        Label.Position = UDim2.new(0, 10, 0, 2)
+        Label.Text = text .. " (" .. tostring(senaV4Config[configKey]) .. ")"
+        Label.TextColor3 = Color3.fromRGB(220, 220, 220)
+        Label.Font = Enum.Font.Gotham
+        Label.TextSize = 11
+        Label.TextXAlignment = Enum.TextXAlignment.Left
+        Label.BackgroundTransparency = 1
+        Label.Parent = SliderFrame
+
+        local SliderBar = Instance.new("TextButton")
+        SliderBar.Size = UDim2.new(1, -20, 0, 8)
+        SliderBar.Position = UDim2.new(0, 10, 0, 24)
+        SliderBar.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+        SliderBar.Text = ""
+        SliderBar.AutoButtonColor = false
+        SliderBar.Parent = SliderFrame
+
+        local Fill = Instance.new("Frame")
+        Fill.Size = UDim2.new((senaV4Config[configKey] - min) / (max - min), 0, 1, 0)
+        Fill.BackgroundColor3 = Color3.fromRGB(0, 140, 255)
+        Fill.BorderSizePixel = 0
+        Fill.Parent = SliderBar
+
+        local dragging = false
+        SliderBar.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true end
+        end)
+        UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+        end)
+        UserInputService.InputChanged:Connect(function(input)
+            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                local mousePos = UserInputService:GetMouseLocation().X
+                local barPos = SliderBar.AbsolutePosition.X
+                local barSize = SliderBar.AbsoluteSize.X
+                local percent = math.clamp((mousePos - barPos) / barSize, 0, 1)
+                local value = math.floor(min + (max - min) * percent)
+                senaV4Config[configKey] = value
+                Fill.Size = UDim2.new(percent, 0, 1, 0)
+                Label.Text = text .. " (" .. tostring(value) .. ")"
+                if callback then callback(value) end
+            end
+        end)
+    end
+
+    function TabElements:AddButton(text, callback)
+        local ButtonFrame = Instance.new("Frame")
+        ButtonFrame.Size = UDim2.new(1, -10, 0, 34)
+        ButtonFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+        ButtonFrame.Parent = PageContainer
+
+        local BFCorner = Instance.new("UICorner")
+        BFCorner.CornerRadius = UDim.new(0, 6)
+        BFCorner.Parent = ButtonFrame
+
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, 0, 1, 0)
+        Btn.BackgroundTransparency = 1
+        Btn.Text = text
+        Btn.TextColor3 = Color3.fromRGB(0, 170, 255)
+        Btn.Font = Enum.Font.GothamBold
+        Btn.TextSize = 11
+        Btn.Parent = ButtonFrame
+
+        Btn.MouseButton1Click:Connect(function()
+            if callback then callback() end
+        end)
+    end
+
+    function TabElements:AddTextbox(text, configKey, placeholder, callback)
+        local BoxFrame = Instance.new("Frame")
+        BoxFrame.Size = UDim2.new(1, -10, 0, 38)
+        BoxFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
+        BoxFrame.Parent = PageContainer
+
+        local BoxCorner = Instance.new("UICorner")
+        BoxCorner.CornerRadius = UDim.new(0, 6)
+        BoxCorner.Parent = BoxFrame
+
+        local Label = Instance.new("TextLabel")
+        Label.Size = UDim2.new(0.4, 0, 1, 0)
+        Label.Position = UDim2.new(0, 10, 0, 0)
+        Label.Text = text
+        Label.TextColor3 = Color3.fromRGB(220, 220, 220)
+        Label.Font = Enum.Font.Gotham
+        Label.TextSize = 11
+        Label.TextXAlignment = Enum.TextXAlignment.Left
+        Label.BackgroundTransparency = 1
+        Label.Parent = BoxFrame
+
+        local TextBox = Instance.new("TextBox")
+        TextBox.Size = UDim2.new(0.55, -10, 0, 24)
+        TextBox.Position = UDim2.new(0.45, 0, 0.5, -12)
+        TextBox.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+        TextBox.Text = tostring(senaV4Config[configKey] or "")
+        TextBox.PlaceholderText = placeholder or "Nhập nội dung..."
+        TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TextBox.Font = Enum.Font.Gotham
+        TextBox.TextSize = 11
+        TextBox.Parent = BoxFrame
+
+        local TBCorner = Instance.new("UICorner")
+        TBCorner.CornerRadius = UDim.new(0, 4)
+        TBCorner.Parent = TextBox
+
+        TextBox.FocusLost:Connect(function()
+            senaV4Config[configKey] = TextBox.Text
+            if callback then callback(TextBox.Text) end
+        end)
+    end
+
+    return TabElements
+end
+
+-----------------------------------------------------------------------------------
+-- 5. MAPPING TOÀN BỘ TAB VÀ CHỨC NĂNG CỦA SENA V4
+-----------------------------------------------------------------------------------
+
+-- Tab 1: Auto Steal
+local StealTab = HihiHub:CreateTab("Auto Steal")
+StealTab:AddToggle("Kích hoạt Auto Steal", "AutoSteal")
+StealTab:AddSlider("Tốc độ Tween Multiplier", "TweenSpeedMultiplier", 1, 10)
+StealTab:AddSlider("Thời gian giữ cướp (Giây)", "StealHoldSeconds", 0, 5)
+StealTab:AddToggle("Bay trên không khi cướp", "FlyAerial")
+StealTab:AddToggle("Tự động cướp của Player", "StealPlayers")
+StealTab:AddTextbox("Lọc tên trứng cụ thể", "StealNamesFilter", "Tên trứng...")
+
+-- Tab 2: Base & Eggs
+local BaseTab = HihiHub:CreateTab("Base & Eggs")
+BaseTab:AddToggle("Tự động đặt trứng (Place)", "AutoPlace")
+BaseTab:AddToggle("Tự động ấp trứng (Hatch)", "AutoHatch")
+BaseTab:AddToggle("Tự động bán trứng (Sell)", "AutoSellEgg")
+BaseTab:AddToggle("Tự động nâng cấp Base", "AutoBaseUpgrade")
+BaseTab:AddToggle("Tự nhận thưởng Offline", "AutoClaimOffline")
+BaseTab:AddToggle("Tự khoá trứng hiếm (Favorite)", "AutoFavorite")
+
+-- Tab 3: Minigames & Pets
+local MinigameTab = HihiHub:CreateTab("Minigames & Pets")
+MinigameTab:AddToggle("Trang bị Pet mạnh nhất", "AutoEquipBest")
+MinigameTab:AddToggle("Tự động dung hợp Pet", "AutoFusePets")
+MinigameTab:AddToggle("Butterfly: Tự bắt bướm", "ButterflyAutoCatch")
+MinigameTab:AddToggle("Butterfly: Hiển thị ESP Bướm", "ButterflyEsp")
+MinigameTab:AddToggle("Scramble: Tự đánh Boss", "ScrambleBossAuto")
+MinigameTab:AddToggle("Scramble: Tự nhặt linh kiện", "ScrambleLostParts")
+
+-- Tab 4: Player & Performance
+local PlayerTab = HihiHub:CreateTab("Player & Physical")
+PlayerTab:AddSlider("Tốc độ di chuyển (WalkSpeed)", "WalkSpeedMultiplier", 16, 120)
+PlayerTab:AddToggle("Xuyên tường (Noclip)", "Noclip")
+PlayerTab:AddToggle("Bất tử (God Mode)", "GodMode")
+PlayerTab:AddToggle("Chống đẩy lùi Guard", "AntiGuardKnockback")
+PlayerTab:AddToggle("Chống AFK", "AntiAFK")
+PlayerTab:AddButton("Bật FPS Boost (Tối ưu Lag)", function()
+    senaV4Config.FPSBoost = true
+    ApplyFPSBoost(true)
+end)
+
+-- Tab 5: Config & Webhook
+local SystemTab = HihiHub:CreateTab("Config & Webhook")
+SystemTab:AddToggle("Gửi Webhook Discord", "WebhookEnabled")
+SystemTab:AddTextbox("Discord Webhook URL", "WebhookURL", "https://discord.com/api/webhooks/...")
+SystemTab:AddButton("Lưu Cấu Hình File .JSON", function()
+    if writefile then
+        writefile("senaV4_config.json", HttpService:JSONEncode(senaV4Config))
+        print("[HihiHub x SenaV4] Đã lưu tệp cấu hình!")
+    end
+end)
+SystemTab:AddButton("Nạp Cấu Hình File .JSON", function()
+    if readfile and isfile and isfile("senaV4_config.json") then
+        local loaded = HttpService:JSONEncode(readfile("senaV4_config.json"))
+        for k, v in pairs(loaded) do
+            senaV4Config[k] = v
+        end
+        print("[HihiHub x SenaV4] Đã tải lại tệp cấu hình!")
+    end
+end)
+
+print("[HihiHub x SenaV4] Đã khởi chạy bản đầy đủ! Bấm 'Z' để ẩn/hiện GUI.")
